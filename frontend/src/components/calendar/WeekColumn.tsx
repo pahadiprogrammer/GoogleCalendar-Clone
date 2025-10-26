@@ -22,11 +22,6 @@ const WeekColumn: React.FC<WeekColumnProps> = ({
     timeSlots.push(hour);
   }
 
-  // Filter events for this specific date
-  const dayEvents = events.filter(event => 
-    isSameDay(event.startTime, date)
-  );
-
   const handleTimeSlotClick = (clickedDate: Date, hour: number) => {
     if (onTimeSlotClick) {
       onTimeSlotClick(clickedDate, hour);
@@ -74,8 +69,8 @@ const WeekColumn: React.FC<WeekColumnProps> = ({
       {/* Time slots */}
       <Box sx={{ flex: 1 }}>
         {timeSlots.map((hour) => {
-          // Get events for this specific hour
-          const hourEvents = dayEvents.filter(event => {
+          // Get events for this specific hour - use events directly (already filtered by date)
+          const hourEvents = events.filter(event => {
             if (event.startTime) {
               return event.startTime.getHours() === hour;
             }
@@ -88,6 +83,7 @@ const WeekColumn: React.FC<WeekColumnProps> = ({
               hour={hour}
               date={date}
               events={hourEvents}
+              allEvents={allEvents}
               isCurrentHour={isDateToday && isCurrentTimeSlot(hour)}
               onClick={handleTimeSlotClick}
             />
