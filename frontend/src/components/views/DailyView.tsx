@@ -1,0 +1,148 @@
+import React from 'react';
+import { Box, Container, Typography, Grid } from '@mui/material';
+import { useCalendar } from '../../contexts/CalendarContext';
+import { useEvents } from '../../contexts/EventContext';
+import { formatTimeSlot } from '../../utils/dateUtils';
+import { WEEK_START_HOUR, WEEK_END_HOUR } from '../../utils/constants';
+import { format, isToday } from 'date-fns';
+import TimeSlot from '../calendar/TimeSlot';
+
+const DailyView: React.FC = () => {
+  const { currentDate, selectedDate, setSelectedDate } = useCalendar();
+  const { getEventsForDate, events: allEvents } = useEvents();
+
+  const handleTimeSlotClick = (date: Date, hour: number) => {
+    setSelectedDate(date);
+    // TODO: In future, we can add time selection functionality
+    console.log(`Selected: ${date.toDateString()} at ${hour}:00`);
+  };
+
+  // Generate time labels for the left column
+  const timeLabels = [];
+  for (let hour = WEEK_START_HOUR; hour <= WEEK_END_HOUR; hour++) {
+    timeLabels.push(formatTimeSlot(hour));
+  }
+
+  const dayHeader = format(currentDate, 'EEEE, MMMM d'); // e.g., "Sunday, October 26"
+  const isTodayDate = isToday(currentDate);
+
+  return (
+    <Container maxWidth="md" sx={{ py: 2 }}>
+      <Box sx={{ width: '100%', overflow: 'auto' }}>
+        <Grid container spacing={0} sx={{ minWidth: 600 }}>
+          {/* Time labels column */}
+          <Grid item xs={12} sm={2} md={1.5}>
+            <Box sx={{ borderRight: '1px solid #e0e0e0', minHeight: '600px' }}>
+              {/* Day header space */}
+              <Box 
+                sx={{ 
+                  height: 60, 
+                  borderBottom: '2px solid #e0e0e0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  px: 1
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: '#666',
+                    fontSize: { xs: '0.7rem', sm: '0.8rem' },
+                    textAlign: 'center',
+                    fontWeight: 500
+                  }}
+                >
+                  Time
+                </Typography>
+              </Box>
+              
+              {/* Time labels */}
+              {timeLabels.map((timeLabel, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    height: 60, // Same as TIME_SLOT_HEIGHT
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderBottom: '1px solid #e0e0e0',
+                    px: { xs: 0.5, sm: 1 }
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: '#666',
+                      fontSize: { xs: '0.6rem', sm: '0.7rem' },
+                      textAlign: 'center'
+                    }}
+                  >
+                    {timeLabel}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          </Grid>
+
+          {/* Day column */}
+          <Grid item xs={12} sm={10} md={10.5}>
+            <Box sx={{ minHeight: '600px' }}>
+              {/* Day header */}
+              <Box
+                sx={{
+                  height: 60,
+                  borderBottom: '2px solid #e0e0e0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: isTodayDate ? '#e3f2fd' : 'transparent',
+                  px: 2
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{
+                    color: isTodayDate ? '#1976d2' : '#333',
+                    fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' },
+                    fontWeight: 600,
+                    textAlign: 'center'
+                  }}
+                >
+                  {dayHeader}
+                </Typography>
+              </Box>
+
+              {/* Time slots */}
+              {Array.from({ length: WEEK_END_HOUR - WEEK_START_HOUR + 1 }, (_, index) => {
+                const hour = WEEK_START_HOUR + index;
+                // Get events for this day and filter by hour
+                const dayEvents = getEventsForDate(currentDate);
+                const hourEvents = dayEvents.filter(event => {
+                  if (event.startTime) {
+                    return event.startTime.getHours() === hour;
+                  }
+                  return false;
+                });
+                
+                return (
+                  <TimeSlot
+                    key={hour}
+                    hour={hour}
+                    date={currentDate}
+                    events={hourEvents}
+                    isCurrentHour={isTodayDate && new Date().getHours() === hour}
+                    onClick={handleTimeSlotClick}
+                    allEvents={allEvents}
+                  />
+                );
+              })}
+            </Box>
+          </Grid>
+        </Grid>
+      </Box>
+    </Container>
+  );
+};
+
+export default DailyView;
