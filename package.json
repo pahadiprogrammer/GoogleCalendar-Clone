@@ -1,0 +1,38 @@
+{
+  "name": "google-calendar-clone",
+  "version": "1.0.0",
+  "description": "A full-stack Google Calendar clone built with React, TypeScript, Express, and SQLite",
+  "private": true,
+  "scripts": {
+    "dev": "python3 start-dev.py",
+    "start": "python3 start-dev.py",
+    "install:frontend": "cd frontend && npm install",
+    "install:backend": "cd backend && npm install",
+    "install:all": "npm run install:frontend && npm run install:backend",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "test:frontend": "cd frontend && npm test",
+    "test:backend": "cd backend && npm test",
+    "db:inspect": "sqlite3 backend/data/calendar.db",
+    "health": "curl -f http://localhost:9999/health && curl -f http://localhost:3000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github-pahadi:pahadiprogrammer/GoogleCalendar-Clone.git"
+  },
+  "keywords": [
+    "calendar",
+    "react",
+    "typescript",
+    "express",
+    "sqlite",
+    "full-stack"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0",
+    "python": ">=3.7.0"
+  }
+}

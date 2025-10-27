@@ -52,13 +52,40 @@ A full-stack calendar application built with React, TypeScript, Express.js, and 
 
 ## 🚀 Quick Start
 
-### 1. Clone the Repository
+### Option 1: Python Script (Recommended)
+
+The easiest way to run the application with zero configuration:
+
 ```bash
+# Clone the repository
 git clone <your-repository-url>
-cd google-calendar
+cd google-calendar-clone
+
+# Install dependencies for both frontend and backend
+npm run install:all
+
+# Start the entire application with Python script
+npm run dev
+# OR directly: python3 start-dev.py
 ```
 
-### 2. Backend Setup
+That's it! The Python script will:
+- ✅ Check for Node.js and npm dependencies
+- ✅ Start backend server on http://localhost:9999
+- ✅ Start frontend server on http://localhost:3000
+- ✅ Provide colored terminal output with status updates
+- ✅ Handle graceful shutdown with Ctrl+C
+
+The application will be available at:
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:9999
+- **Health Check**: http://localhost:9999/health
+
+### Option 2: Manual Setup
+
+If you prefer to run without Docker:
+
+#### 2.1. Backend Setup
 ```bash
 # Navigate to backend directory
 cd backend
@@ -69,11 +96,11 @@ npm install
 # Run database migrations
 npm run db:migrate
 
-# Start development server (runs on http://localhost:3002)
+# Start development server (runs on http://localhost:9999)
 npm run dev
 ```
 
-### 3. Frontend Setup
+#### 2.2. Frontend Setup
 ```bash
 # Open new terminal and navigate to frontend directory
 cd frontend
@@ -85,17 +112,69 @@ npm install
 npm run dev
 ```
 
-### 4. Access the Application
+#### 2.3. Access the Application
 - **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:3002
-- **Health Check**: http://localhost:3002/api/v1/health
+- **Backend API**: http://localhost:9999
+- **Health Check**: http://localhost:9999/health
+
+## 🐍 Python Development Script
+
+### Features
+The `start-dev.py` script provides a comprehensive development environment with:
+- ✅ **Dependency Checking**: Verifies Node.js and npm are installed
+- ✅ **Automatic Setup**: Handles database migrations and environment setup
+- ✅ **Colored Output**: Beautiful terminal output with status indicators
+- ✅ **Process Management**: Manages both frontend and backend processes
+- ✅ **Graceful Shutdown**: Clean shutdown with Ctrl+C
+- ✅ **Error Handling**: Comprehensive error reporting and recovery
+
+### Python Script Commands
+```bash
+# Start development environment (recommended)
+npm run dev
+# OR directly:
+python3 start-dev.py
+
+# Alternative start command
+npm start
+```
+
+### Script Output Example
+```bash
+🚀 Google Calendar Clone - Development Server
+
+✅ Node.js found: v18.17.0
+✅ npm found: 9.6.7
+✅ Python found: 3.11.4
+
+🔧 Setting up environment...
+✅ Backend environment configured (PORT=9999)
+✅ Frontend environment configured (VITE_API_BASE_URL=http://localhost:9999/api/v1)
+
+🚀 Starting backend server...
+✅ Backend server started on http://localhost:9999
+
+� Starting frontend server...
+✅ Frontend server started on http://localhost:3000
+
+🎉 Development servers are running!
+   Frontend: http://localhost:3000
+   Backend:  http://localhost:9999
+   Health:   http://localhost:9999/health
+
+Press Ctrl+C to stop all servers...
+```
 
 ## 🔧 Development Workflow
 
 ### Running Both Servers
-For full-stack development, you need both servers running simultaneously:
+The Python script automatically handles both servers, but you can also run them manually:
 
 ```bash
+# Option 1: Python script (recommended)
+npm run dev
+
+# Option 2: Manual setup
 # Terminal 1 - Backend
 cd backend && npm run dev
 
@@ -104,6 +183,19 @@ cd frontend && npm run dev
 ```
 
 ### Available Scripts
+
+#### Root Level Scripts
+```bash
+npm run dev              # Start with Python script
+npm start                # Alternative start command
+npm run install:all      # Install all dependencies
+npm run build:frontend   # Build frontend for production
+npm run build:backend    # Build backend for production
+npm run test:frontend    # Run frontend tests
+npm run test:backend     # Run backend tests
+npm run db:inspect       # Access SQLite database
+npm run health           # Health check both services
+```
 
 #### Frontend Scripts
 ```bash
@@ -120,7 +212,7 @@ npm run start      # Start production server
 npm run db:migrate # Run database migrations
 ```
 
-### Database Operations
+### Database Operations (Manual)
 ```bash
 # Access SQLite database directly
 sqlite3 backend/data/calendar.db
@@ -159,11 +251,15 @@ google-calendar/
 └── README.md
 ```
 
-## 🔌 API Documentation
+## � API Documentation
 
 ### Base URL
 ```
-http://localhost:3002/api/v1
+# Docker (Recommended)
+http://localhost:9999/api/v1
+
+# Manual Setup
+http://localhost:9999/api/v1
 ```
 
 ### Endpoints
@@ -287,34 +383,45 @@ Robust date management using date-fns library:
 ### API Testing
 ```bash
 # Health check
-curl http://localhost:3002/api/v1/health
+curl http://localhost:9999/health
 
 # Get all events
-curl http://localhost:3002/api/v1/events
+curl http://localhost:9999/api/v1/events
 
 # Create event
-curl -X POST http://localhost:3002/api/v1/events \
+curl -X POST http://localhost:9999/api/v1/events \
   -H "Content-Type: application/json" \
   -d '{"title":"Test Event","startTime":"2025-10-26T19:00:00.000Z","isAllDay":false,"color":"#1976d2"}'
 ```
 
 ## 📝 Environment Configuration
 
-### Backend (.env)
+### Docker Environment (Automatic)
+The Docker setup automatically configures all environment variables. No manual setup required.
+
+### Manual Setup (.env files)
+
+#### Backend (.env)
 ```bash
 # Database Configuration
 DATABASE_URL=./data/calendar.db
 NODE_ENV=development
 
 # Server Configuration
-PORT=3002
-HOST=localhost
+PORT=9999
+HOST=0.0.0.0
 
 # CORS Configuration
 FRONTEND_URL=http://localhost:3000
 
 # API Configuration
 API_PREFIX=/api/v1
+```
+
+#### Frontend (Environment Variables)
+```bash
+# API Configuration (for manual setup)
+VITE_API_BASE_URL=http://localhost:9999/api/v1
 ```
 
 ## 🎉 Production Ready
