@@ -26,6 +26,129 @@ A full-stack calendar application built with React, TypeScript, Express.js, and 
 - ✅ **Date Navigation**: Easy month/week/day navigation with keyboard shortcuts
 - ✅ **Event Persistence**: All events saved to database and survive server restarts
 
+## 📋 Prerequisites
+
+- **Node.js** 18.0.0 or higher
+- **npm** 8.0.0 or higher
+- **Python** 3.6 or higher
+- **Git** (for cloning the repository)
+
+## ⚡ Quick Start (30 Seconds!)
+
+### 🎯 One-Command Setup (Recommended)
+
+The easiest way to run the entire application with **zero configuration**:
+
+```bash
+# 1. Clone the repository
+git clone <your-repository-url>
+cd google-calendar-clone
+
+# 2. Install all dependencies
+npm run install:all
+
+# 3. Start the entire application
+npm run dev
+```
+
+**That's it! 🎉** The Python script handles everything automatically.
+
+### 🖥️ What You'll See
+
+```bash
+============================================================
+🚀 Google Calendar Clone - Development Server
+============================================================
+📁 Checking project structure...
+✅ Project structure verified
+📦 Checking dependencies...
+✅ Dependencies verified
+🔧 Starting backend server (port 9999)...
+✅ Backend server started successfully
+🎨 Starting frontend server (port 3000)...
+✅ Frontend server started successfully
+
+============================================================
+🎉 Development servers are running!
+============================================================
+📱 Frontend:  http://localhost:3000
+🔧 Backend:   http://localhost:9999
+🏥 Health:    http://localhost:9999/health
+📚 API Docs:  http://localhost:9999/api/v1
+============================================================
+💡 Press Ctrl+C to stop both servers
+============================================================
+```
+
+### 🌐 Access Your Application
+
+Once started, your application will be available at:
+- **📱 Frontend**: http://localhost:3000 ← **Open this in your browser**
+- **🔧 Backend API**: http://localhost:9999
+- **🏥 Health Check**: http://localhost:9999/health
+
+## 🐍 Python Development Script Features
+
+### ✨ What the Script Does Automatically
+
+- ✅ **Validates Environment**: Checks Node.js, npm, and Python versions
+- ✅ **Dependency Management**: Verifies node_modules exist, provides helpful install commands
+- ✅ **Process Management**: Starts both frontend and backend servers concurrently
+- ✅ **Beautiful Output**: Colored terminal output with clear status indicators
+- ✅ **Error Handling**: Comprehensive error reporting and recovery suggestions
+- ✅ **Graceful Shutdown**: Clean shutdown of both servers with Ctrl+C
+- ✅ **Process Monitoring**: Detects if servers crash and handles cleanup
+- ✅ **Cross-Platform**: Works on macOS, Linux, and Windows
+
+### 🎮 Available Commands
+
+```bash
+# Primary commands (recommended)
+npm run dev              # Start with Python script
+npm start                # Alternative start command
+python3 start-dev.py     # Direct Python execution
+
+# Utility commands
+npm run install:all      # Install all dependencies
+npm run health           # Health check both services
+npm run db:inspect       # Access SQLite database
+```
+
+### 🛠️ Troubleshooting
+
+#### Python Not Found
+```bash
+# Install Python 3.6+ from python.org
+# Or use package manager:
+brew install python3      # macOS
+sudo apt install python3  # Ubuntu/Debian
+```
+
+#### Node.js Not Found
+```bash
+# Install Node.js 18+ from nodejs.org
+# Or use package manager:
+brew install node         # macOS
+sudo apt install nodejs npm  # Ubuntu/Debian
+```
+
+#### Dependencies Missing
+The script will detect missing dependencies and show:
+```bash
+⚠️  Missing dependencies in: frontend, backend
+💡 Run the following commands to install dependencies:
+   cd frontend && npm install
+   cd backend && npm install
+```
+
+#### Port Already in Use
+If ports 3000 or 9999 are busy:
+```bash
+# Kill processes using the ports
+lsof -ti:3000 | xargs kill -9
+lsof -ti:9999 | xargs kill -9
+```
+
 ## 🛠️ Technology Stack
 
 ### Frontend
@@ -44,48 +167,13 @@ A full-stack calendar application built with React, TypeScript, Express.js, and 
 - **CORS & Helmet** - Security middleware
 - **UUID 9.0.1** - Unique identifier generation
 
-## 📋 Prerequisites
+## 🔧 Alternative Setup Methods
 
-- **Node.js** 18.0.0 or higher
-- **npm** 8.0.0 or higher
-- **Git** (for cloning the repository)
+### Option 1: Manual Setup (Advanced Users)
 
-## 🚀 Quick Start
+If you prefer to run servers separately:
 
-### Option 1: Python Script (Recommended)
-
-The easiest way to run the application with zero configuration:
-
-```bash
-# Clone the repository
-git clone <your-repository-url>
-cd google-calendar-clone
-
-# Install dependencies for both frontend and backend
-npm run install:all
-
-# Start the entire application with Python script
-npm run dev
-# OR directly: python3 start-dev.py
-```
-
-That's it! The Python script will:
-- ✅ Check for Node.js and npm dependencies
-- ✅ Start backend server on http://localhost:9999
-- ✅ Start frontend server on http://localhost:3000
-- ✅ Provide colored terminal output with status updates
-- ✅ Handle graceful shutdown with Ctrl+C
-
-The application will be available at:
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:9999
-- **Health Check**: http://localhost:9999/health
-
-### Option 2: Manual Setup
-
-If you prefer to run without Docker:
-
-#### 2.1. Backend Setup
+#### Backend Setup
 ```bash
 # Navigate to backend directory
 cd backend
@@ -93,14 +181,11 @@ cd backend
 # Install dependencies
 npm install
 
-# Run database migrations
-npm run db:migrate
-
 # Start development server (runs on http://localhost:9999)
 npm run dev
 ```
 
-#### 2.2. Frontend Setup
+#### Frontend Setup
 ```bash
 # Open new terminal and navigate to frontend directory
 cd frontend
@@ -112,69 +197,18 @@ npm install
 npm run dev
 ```
 
-#### 2.3. Access the Application
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:9999
-- **Health Check**: http://localhost:9999/health
+### Option 2: Docker Setup (Coming Soon)
 
-## 🐍 Python Development Script
-
-### Features
-The `start-dev.py` script provides a comprehensive development environment with:
-- ✅ **Dependency Checking**: Verifies Node.js and npm are installed
-- ✅ **Automatic Setup**: Handles database migrations and environment setup
-- ✅ **Colored Output**: Beautiful terminal output with status indicators
-- ✅ **Process Management**: Manages both frontend and backend processes
-- ✅ **Graceful Shutdown**: Clean shutdown with Ctrl+C
-- ✅ **Error Handling**: Comprehensive error reporting and recovery
-
-### Python Script Commands
-```bash
-# Start development environment (recommended)
-npm run dev
-# OR directly:
-python3 start-dev.py
-
-# Alternative start command
-npm start
-```
-
-### Script Output Example
-```bash
-🚀 Google Calendar Clone - Development Server
-
-✅ Node.js found: v18.17.0
-✅ npm found: 9.6.7
-✅ Python found: 3.11.4
-
-🔧 Setting up environment...
-✅ Backend environment configured (PORT=9999)
-✅ Frontend environment configured (VITE_API_BASE_URL=http://localhost:9999/api/v1)
-
-🚀 Starting backend server...
-✅ Backend server started on http://localhost:9999
-
-� Starting frontend server...
-✅ Frontend server started on http://localhost:3000
-
-🎉 Development servers are running!
-   Frontend: http://localhost:3000
-   Backend:  http://localhost:9999
-   Health:   http://localhost:9999/health
-
-Press Ctrl+C to stop all servers...
-```
+Docker configuration is available but the **Python script is recommended** for the best development experience.
 
 ## 🔧 Development Workflow
 
 ### Running Both Servers
-The Python script automatically handles both servers, but you can also run them manually:
-
 ```bash
-# Option 1: Python script (recommended)
+# Recommended: Python script handles everything
 npm run dev
 
-# Option 2: Manual setup
+# Manual: Run in separate terminals
 # Terminal 1 - Backend
 cd backend && npm run dev
 
@@ -186,7 +220,7 @@ cd frontend && npm run dev
 
 #### Root Level Scripts
 ```bash
-npm run dev              # Start with Python script
+npm run dev              # Start with Python script ⭐ RECOMMENDED
 npm start                # Alternative start command
 npm run install:all      # Install all dependencies
 npm run build:frontend   # Build frontend for production
@@ -197,14 +231,14 @@ npm run db:inspect       # Access SQLite database
 npm run health           # Health check both services
 ```
 
-#### Frontend Scripts
+#### Frontend Scripts (cd frontend)
 ```bash
 npm run dev      # Start development server
 npm run build    # Build for production
 npm run preview  # Preview production build
 ```
 
-#### Backend Scripts
+#### Backend Scripts (cd backend)
 ```bash
 npm run dev        # Start development server with hot reload
 npm run build      # Compile TypeScript to JavaScript
@@ -212,53 +246,39 @@ npm run start      # Start production server
 npm run db:migrate # Run database migrations
 ```
 
-### Database Operations (Manual)
-```bash
-# Access SQLite database directly
-sqlite3 backend/data/calendar.db
-
-# View all events
-sqlite3 backend/data/calendar.db "SELECT * FROM events;" -header -column
-
-# Reset database (delete all events)
-rm backend/data/calendar.db && npm run db:migrate
-```
-
 ## 📁 Project Structure
 
 ```
 google-calendar/
-├── frontend/                 # React frontend application
+├── 🐍 start-dev.py             # Python development script
+├── 📦 package.json              # Root package configuration
+├── frontend/                    # React frontend application
 │   ├── src/
-│   │   ├── components/      # Reusable UI components
-│   │   │   ├── calendar/    # Calendar-specific components
-│   │   │   ├── events/      # Event management components
-│   │   │   └── views/       # Calendar view containers
-│   │   ├── contexts/        # React Context providers
-│   │   ├── services/        # API communication layer
-│   │   ├── types/           # TypeScript type definitions
-│   │   └── utils/           # Utility functions
+│   │   ├── components/         # Reusable UI components
+│   │   │   ├── calendar/       # Calendar-specific components
+│   │   │   ├── events/         # Event management components
+│   │   │   └── views/          # Calendar view containers
+│   │   ├── contexts/           # React Context providers
+│   │   ├── services/           # API communication layer
+│   │   ├── types/              # TypeScript type definitions
+│   │   └── utils/              # Utility functions
 │   ├── package.json
 │   └── vite.config.ts
-├── backend/                 # Express.js backend API
+├── backend/                    # Express.js backend API
 │   ├── src/
-│   │   ├── database/        # Database configuration and migrations
-│   │   ├── routes/          # API route handlers
-│   │   ├── services/        # Business logic layer
-│   │   └── types/           # TypeScript interfaces
-│   ├── data/               # SQLite database file
+│   │   ├── database/           # Database configuration and migrations
+│   │   ├── routes/             # API route handlers
+│   │   ├── services/           # Business logic layer
+│   │   └── types/              # TypeScript interfaces
+│   ├── data/                   # SQLite database file
 │   └── package.json
 └── README.md
 ```
 
-## � API Documentation
+## 🌐 API Documentation
 
 ### Base URL
 ```
-# Docker (Recommended)
-http://localhost:9999/api/v1
-
-# Manual Setup
 http://localhost:9999/api/v1
 ```
 
@@ -323,6 +343,20 @@ DELETE /events/:id
 GET /health
 ```
 
+### API Testing
+```bash
+# Health check
+curl http://localhost:9999/health
+
+# Get all events
+curl http://localhost:9999/api/v1/events
+
+# Create event
+curl -X POST http://localhost:9999/api/v1/events \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Test Event","startTime":"2025-10-26T19:00:00.000Z","isAllDay":false,"color":"#1976d2"}'
+```
+
 ## 🗄️ Database Schema
 
 ### Events Table
@@ -342,6 +376,19 @@ CREATE TABLE events (
 -- Performance indexes
 CREATE INDEX idx_events_start_time ON events(start_time);
 CREATE INDEX idx_events_date_range ON events(start_time, end_time);
+```
+
+### Database Operations
+```bash
+# Access SQLite database directly
+npm run db:inspect
+# OR: sqlite3 backend/data/calendar.db
+
+# View all events
+sqlite3 backend/data/calendar.db "SELECT * FROM events;" -header -column
+
+# Reset database (delete all events)
+rm backend/data/calendar.db && cd backend && npm run db:migrate
 ```
 
 ## 🎯 Key Features Explained
@@ -380,26 +427,26 @@ Robust date management using date-fns library:
 - [ ] Verify events persist after page refresh
 - [ ] Test form validation with invalid inputs
 
-### API Testing
+### Quick Test Commands
 ```bash
-# Health check
-curl http://localhost:9999/health
+# Start the application
+npm run dev
 
-# Get all events
-curl http://localhost:9999/api/v1/events
+# In another terminal, test the API
+npm run health
 
-# Create event
-curl -X POST http://localhost:9999/api/v1/events \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Test Event","startTime":"2025-10-26T19:00:00.000Z","isAllDay":false,"color":"#1976d2"}'
+# Access the database
+npm run db:inspect
 ```
 
 ## 📝 Environment Configuration
 
-### Docker Environment (Automatic)
-The Docker setup automatically configures all environment variables. No manual setup required.
+### Automatic Configuration (Python Script)
+The Python script automatically sets up all environment variables:
+- **Backend**: PORT=9999, NODE_ENV=development
+- **Frontend**: VITE_API_BASE_URL=http://localhost:9999/api/v1
 
-### Manual Setup (.env files)
+### Manual Configuration (.env files)
 
 #### Backend (.env)
 ```bash
@@ -433,7 +480,21 @@ This application includes:
 - ✅ **Performance**: Optimized database queries with indexing
 - ✅ **Scalability**: Modular architecture ready for expansion
 - ✅ **Documentation**: Comprehensive code documentation and project rules
+- ✅ **Development Tools**: Python script for seamless development experience
+
+## 🚀 Next Steps
+
+After getting the application running:
+
+1. **Explore the Calendar Views**: Try switching between Monthly, Weekly, Daily, and Yearly views
+2. **Create Events**: Use the floating action button (+) to create new events
+3. **Test Cross-View Sync**: Create an event in one view and see it appear in others
+4. **Try Responsive Design**: Resize your browser or test on mobile devices
+5. **Inspect the Database**: Use `npm run db:inspect` to see your events in SQLite
+6. **API Testing**: Use the provided curl commands to test the REST API
 
 ---
 
-**Built with ❤️ using React, TypeScript, and Express.js**
+**Built with ❤️ using React, TypeScript, Express.js, and Python**
+
+**🐍 Powered by Python Development Script for the Ultimate Developer Experience**
