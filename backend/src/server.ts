@@ -15,8 +15,8 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 const app = express()
-const PORT = process.env.PORT || 3001
-const HOST = process.env.HOST || 'localhost'
+const PORT = parseInt(process.env.PORT || '9999', 10)
+const HOST = process.env.HOST || '0.0.0.0'
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000'
 const API_PREFIX = process.env.API_PREFIX || '/api/v1'
 
