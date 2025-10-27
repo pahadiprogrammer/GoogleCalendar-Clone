@@ -11,7 +11,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   dates,
   currentMonth,
   selectedDate,
-  onDateClick
+  onDateClick,
+  onEventClick
 }) => {
   const calendarDays = getMonthCalendarDays(currentMonth);
   const { getEventsForDate, events: allEvents } = useEvents();
@@ -37,6 +38,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                 isSelected={isSelectedDate}
                 events={getEventsForDate(date)}
                 onClick={onDateClick}
+                onEventClick={onEventClick}
                 allEvents={allEvents}
               />
             </Grid>

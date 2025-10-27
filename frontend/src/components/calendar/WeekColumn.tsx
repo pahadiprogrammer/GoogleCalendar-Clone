@@ -11,6 +11,7 @@ const WeekColumn: React.FC<WeekColumnProps> = ({
   events = [],
   selectedDate,
   onTimeSlotClick,
+  onEventClick,
   allEvents = []
 }) => {
   const isDateToday = isToday(date);
@@ -86,6 +87,7 @@ const WeekColumn: React.FC<WeekColumnProps> = ({
               allEvents={allEvents}
               isCurrentHour={isDateToday && isCurrentTimeSlot(hour)}
               onClick={handleTimeSlotClick}
+              onEventClick={onEventClick}
             />
           );
         })}

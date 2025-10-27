@@ -13,6 +13,7 @@ export interface DateCellProps {
   events?: CalendarEvent[]
   allEvents?: CalendarEvent[]
   onClick?: (date: Date) => void
+  onEventClick?: (event: CalendarEvent) => void
 }
 
 export interface CalendarGridProps {
@@ -20,6 +21,7 @@ export interface CalendarGridProps {
   currentMonth: Date
   selectedDate?: Date | null
   onDateClick?: (date: Date) => void
+  onEventClick?: (event: CalendarEvent) => void
 }
 
 export interface WeekHeaderProps {
@@ -91,6 +93,7 @@ export interface TimeSlotProps {
   allEvents?: CalendarEvent[]
   isCurrentHour?: boolean
   onClick?: (date: Date, hour: number) => void
+  onEventClick?: (event: CalendarEvent) => void
 }
 
 export interface WeekColumnProps {
@@ -99,6 +102,7 @@ export interface WeekColumnProps {
   allEvents?: CalendarEvent[]
   selectedDate?: Date | null
   onTimeSlotClick?: (date: Date, hour: number) => void
+  onEventClick?: (event: CalendarEvent) => void
 }
 
 export interface WeeklyViewProps {

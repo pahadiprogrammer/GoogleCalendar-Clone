@@ -10,11 +10,18 @@ const DateCell: React.FC<DateCellProps> = ({
   isSelected,
   events = [],
   onClick,
+  onEventClick,
   allEvents = []
 }) => {
   const handleClick = () => {
     if (onClick) {
       onClick(date);
+    }
+  };
+
+  const handleEventClick = (calendarEvent: any) => {
+    if (onEventClick) {
+      onEventClick(calendarEvent);
     }
   };
 
@@ -56,6 +63,7 @@ const DateCell: React.FC<DateCellProps> = ({
               maxWidth="100%"
               allEvents={allEvents}
               showOverlapIndicator={true}
+              onClick={handleEventClick}
             />
           ))}
           

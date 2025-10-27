@@ -11,11 +11,18 @@ const TimeSlot: React.FC<TimeSlotProps> = ({
   events = [],
   allEvents = [],
   isCurrentHour = false,
-  onClick
+  onClick,
+  onEventClick
 }) => {
   const handleClick = () => {
     if (onClick) {
       onClick(date, hour);
+    }
+  };
+
+  const handleEventClick = (calendarEvent: any) => {
+    if (onEventClick) {
+      onEventClick(calendarEvent);
     }
   };
 
@@ -62,6 +69,7 @@ const TimeSlot: React.FC<TimeSlotProps> = ({
             allEvents={allEvents}
             showOverlapIndicator={true}
             maxWidth="100%"
+            onClick={handleEventClick}
           />
         ))}
         

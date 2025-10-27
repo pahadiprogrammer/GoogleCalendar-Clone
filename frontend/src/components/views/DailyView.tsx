@@ -1,20 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Container, Typography, Grid } from '@mui/material';
 import { useCalendar } from '../../contexts/CalendarContext';
 import { useEvents } from '../../contexts/EventContext';
+import { CalendarEvent } from '../../types/calendar';
 import { formatTimeSlot } from '../../utils/dateUtils';
 import { WEEK_START_HOUR, WEEK_END_HOUR } from '../../utils/constants';
 import { format, isToday } from 'date-fns';
 import TimeSlot from '../calendar/TimeSlot';
+import EventDetailsDialog from '../events/EventDetailsDialog';
 
 const DailyView: React.FC = () => {
   const { currentDate, selectedDate, setSelectedDate } = useCalendar();
   const { getEventsForDate, events: allEvents } = useEvents();
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [showEventDetails, setShowEventDetails] = useState(false);
 
   const handleTimeSlotClick = (date: Date, hour: number) => {
     setSelectedDate(date);
     // TODO: In future, we can add time selection functionality
     console.log(`Selected: ${date.toDateString()} at ${hour}:00`);
+  };
+
+  const handleEventClick = (event: CalendarEvent) => {
+    setSelectedEvent(event);
+    setShowEventDetails(true);
+  };
+
+  const handleCloseEventDetails = () => {
+    setShowEventDetails(false);
+    setSelectedEvent(null);
   };
 
   // Generate time labels for the left column
@@ -133,6 +147,7 @@ const DailyView: React.FC = () => {
                     events={hourEvents}
                     isCurrentHour={isTodayDate && new Date().getHours() === hour}
                     onClick={handleTimeSlotClick}
+                    onEventClick={handleEventClick}
                     allEvents={allEvents}
                   />
                 );
@@ -141,6 +156,13 @@ const DailyView: React.FC = () => {
           </Grid>
         </Grid>
       </Box>
+
+      {/* Event Details Dialog */}
+      <EventDetailsDialog
+        open={showEventDetails}
+        event={selectedEvent}
+        onClose={handleCloseEventDetails}
+      />
     </Container>
   );
 };

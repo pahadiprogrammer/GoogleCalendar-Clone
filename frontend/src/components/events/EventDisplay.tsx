@@ -1,9 +1,11 @@
-import React from 'react'
-import { Box, Typography, Chip, Tooltip } from '@mui/material'
-import { Warning, ErrorOutline } from '@mui/icons-material'
+import React, { useState } from 'react'
+import { Box, Typography, Chip, Tooltip, IconButton } from '@mui/material'
+import { Warning, ErrorOutline, Delete } from '@mui/icons-material'
 import { format } from 'date-fns'
 import { CalendarEvent } from '../../types/calendar'
 import { detectEventOverlaps, getOverlapSeverity, formatConflictMessage } from '../../utils/eventUtils'
+import { useEvents } from '../../contexts/EventContext'
+import ConfirmationDialog from '../common/ConfirmationDialog'
 
 interface EventDisplayProps {
   event: CalendarEvent
@@ -12,6 +14,7 @@ interface EventDisplayProps {
   maxWidth?: string | number
   allEvents?: CalendarEvent[]
   showOverlapIndicator?: boolean
+  showDeleteButton?: boolean
 }
 
 const EventDisplay: React.FC<EventDisplayProps> = ({
@@ -20,9 +23,16 @@ const EventDisplay: React.FC<EventDisplayProps> = ({
   onClick,
   maxWidth = '100%',
   allEvents = [],
-  showOverlapIndicator = true
+  showOverlapIndicator = true,
+  showDeleteButton = true
 }) => {
-  const handleClick = () => {
+  const { deleteEvent } = useEvents()
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation() // Prevent parent click handlers
     if (onClick) {
       onClick(event)
     }
@@ -90,7 +100,31 @@ const EventDisplay: React.FC<EventDisplayProps> = ({
     if (event.isAllDay) {
       return 'All day'
     }
+    if (!event.startTime || !event.endTime) {
+      return 'Invalid time'
+    }
     return `${formatTime(event.startTime)} - ${formatTime(event.endTime)}`
+  }
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation() // Prevent event click when delete button is clicked
+    setShowDeleteDialog(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    setIsDeleting(true)
+    try {
+      await deleteEvent(event.id)
+      setShowDeleteDialog(false)
+    } catch (error) {
+      console.error('Failed to delete event:', error)
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  const handleDeleteCancel = () => {
+    setShowDeleteDialog(false)
   }
 
   if (variant === 'minimal') {
@@ -189,51 +223,76 @@ const EventDisplay: React.FC<EventDisplayProps> = ({
 
   // Detailed variant
   return (
-    <Box
-      onClick={handleClick}
-      sx={{
-        width: '100%',
-        maxWidth,
-        border: `2px solid ${getEventColor(event.color)}`,
-        borderRadius: '8px',
-        cursor: onClick ? 'pointer' : 'default',
-        p: 1.5,
-        mb: 1,
-        backgroundColor: 'white',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        ...getOverlapStyles(),
-        '&:hover': onClick ? {
-          boxShadow: '0 4px 8px rgba(0,0,0,0.15)',
-          transform: 'translateY(-1px)'
-        } : {},
-        transition: 'all 0.2s ease-in-out'
-      }}
-    >
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-          <Typography
-            variant="subtitle2"
-            sx={{
-              fontWeight: 600,
-              color: getEventColor(event.color),
-              mr: 1
-            }}
-          >
-            {event.title}
-          </Typography>
-          {getOverlapIcon()}
+    <>
+      <Box
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={handleClick}
+        sx={{
+          width: '100%',
+          maxWidth,
+          border: `2px solid ${getEventColor(event.color)}`,
+          borderRadius: '8px',
+          cursor: onClick ? 'pointer' : 'default',
+          p: 1.5,
+          mb: 1,
+          backgroundColor: 'white',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          position: 'relative',
+          ...getOverlapStyles(),
+          '&:hover': onClick ? {
+            boxShadow: '0 4px 8px rgba(0,0,0,0.15)',
+            transform: 'translateY(-1px)'
+          } : {},
+          transition: 'all 0.2s ease-in-out'
+        }}
+      >
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                fontWeight: 600,
+                color: getEventColor(event.color),
+                mr: 1
+              }}
+            >
+              {event.title}
+            </Typography>
+            {getOverlapIcon()}
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            {showDeleteButton && isHovered && (
+              <Tooltip title="Delete Event" arrow>
+                <IconButton
+                  onClick={handleDeleteClick}
+                  size="small"
+                  sx={{
+                    color: '#f44336',
+                    backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                    '&:hover': {
+                      backgroundColor: 'rgba(244, 67, 54, 0.2)',
+                    },
+                    width: 24,
+                    height: 24
+                  }}
+                >
+                  <Delete sx={{ fontSize: '14px' }} />
+                </IconButton>
+              </Tooltip>
+            )}
+            <Chip
+              label={hasOverlaps ? 'Conflict' : 'Event'}
+              size="small"
+              sx={{
+                backgroundColor: hasOverlaps ? '#f44336' : getEventColor(event.color),
+                color: 'white',
+                fontSize: '0.6rem',
+                height: '20px'
+              }}
+            />
+          </Box>
         </Box>
-        <Chip
-          label={hasOverlaps ? 'Conflict' : 'Event'}
-          size="small"
-          sx={{
-            backgroundColor: hasOverlaps ? '#f44336' : getEventColor(event.color),
-            color: 'white',
-            fontSize: '0.6rem',
-            height: '20px'
-          }}
-        />
-      </Box>
 
       <Typography
         variant="caption"
@@ -277,7 +336,20 @@ const EventDisplay: React.FC<EventDisplayProps> = ({
         </Typography>
       )}
 
-    </Box>
+      </Box>
+
+      <ConfirmationDialog
+        open={showDeleteDialog}
+        title="Delete Event"
+        message={`Are you sure you want to delete "${event.title}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+        loading={isDeleting}
+        confirmColor="error"
+      />
+    </>
   )
 }
 
