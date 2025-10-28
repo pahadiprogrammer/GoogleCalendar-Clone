@@ -5,6 +5,7 @@ import { formatWeekColumnHeader, isCurrentTimeSlot } from '../../utils/dateUtils
 import { WEEK_START_HOUR, WEEK_END_HOUR } from '../../utils/constants';
 import { isToday, isSameDay } from 'date-fns';
 import TimeSlot from './TimeSlot';
+import WeekEventLayout from './WeekEventLayout';
 
 const WeekColumn: React.FC<WeekColumnProps> = ({
   date,
@@ -67,30 +68,40 @@ const WeekColumn: React.FC<WeekColumnProps> = ({
         </Typography>
       </Box>
 
-      {/* Time slots */}
-      <Box sx={{ flex: 1 }}>
-        {timeSlots.map((hour) => {
-          // Get events for this specific hour - use events directly (already filtered by date)
-          const hourEvents = events.filter(event => {
-            if (event.startTime) {
-              return event.startTime.getHours() === hour;
-            }
-            return false;
-          });
-
-          return (
-            <TimeSlot
-              key={hour}
-              hour={hour}
-              date={date}
-              events={hourEvents}
-              allEvents={allEvents}
-              isCurrentHour={isDateToday && isCurrentTimeSlot(hour)}
-              onClick={handleTimeSlotClick}
-              onEventClick={onEventClick}
-            />
-          );
-        })}
+      {/* Time slots and events container */}
+      <Box sx={{ flex: 1, position: 'relative' }}>
+        {/* Background time slots (for clicking and visual grid) */}
+        {timeSlots.map((hour) => (
+          <TimeSlot
+            key={hour}
+            hour={hour}
+            date={date}
+            events={[]} // No events in time slots anymore
+            allEvents={allEvents}
+            isCurrentHour={isDateToday && isCurrentTimeSlot(hour)}
+            onClick={handleTimeSlotClick}
+            onEventClick={onEventClick}
+          />
+        ))}
+        
+        {/* Absolute positioned events overlay */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            pointerEvents: 'none' // Allow clicks to pass through to time slots
+          }}
+        >
+          <WeekEventLayout
+            date={date}
+            events={events}
+            allEvents={allEvents}
+            onEventClick={onEventClick}
+          />
+        </Box>
       </Box>
     </Box>
   );

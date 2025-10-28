@@ -78,8 +78,8 @@ const EventForm: React.FC<EventFormProps> = ({
         // Editing existing event
         setFormData({
           title: event.title,
-          startTime: event.startTime,
-          endTime: event.endTime,
+          startTime: event.startTime || new Date(),
+          endTime: event.endTime || addHours(new Date(), 1),
           description: event.description || '',
           color: event.color || '#1976d2'
         })
@@ -315,9 +315,27 @@ const EventForm: React.FC<EventFormProps> = ({
                     : format(formData.startTime, "yyyy-MM-dd'T'HH:mm")
                   }
                   onChange={(e) => {
-                    const newDate = new Date(e.target.value)
-                    if (!isNaN(newDate.getTime())) {
-                      handleStartTimeChange(newDate)
+                    if (isAllDay) {
+                      // For date-only inputs, create date at start of day
+                      const dateValue = e.target.value + 'T00:00:00'
+                      const newDate = new Date(dateValue)
+                      if (!isNaN(newDate.getTime())) {
+                        handleStartTimeChange(newDate)
+                      }
+                    } else {
+                      // For datetime-local inputs, parse as local time to avoid timezone issues
+                      const datetimeValue = e.target.value
+                      if (datetimeValue) {
+                        // Parse datetime-local as local time (no timezone conversion)
+                        const [datePart, timePart] = datetimeValue.split('T')
+                        const [year, month, day] = datePart.split('-').map(Number)
+                        const [hour, minute] = timePart.split(':').map(Number)
+                        
+                        const newDate = new Date(year, month - 1, day, hour, minute, 0, 0)
+                        if (!isNaN(newDate.getTime())) {
+                          handleStartTimeChange(newDate)
+                        }
+                      }
                     }
                   }}
                   disabled={isSubmitting}
@@ -338,9 +356,27 @@ const EventForm: React.FC<EventFormProps> = ({
                     : format(formData.endTime, "yyyy-MM-dd'T'HH:mm")
                   }
                   onChange={(e) => {
-                    const newDate = new Date(e.target.value)
-                    if (!isNaN(newDate.getTime())) {
-                      handleEndTimeChange(newDate)
+                    if (isAllDay) {
+                      // For date-only inputs, create date at end of day
+                      const dateValue = e.target.value + 'T23:59:59'
+                      const newDate = new Date(dateValue)
+                      if (!isNaN(newDate.getTime())) {
+                        handleEndTimeChange(newDate)
+                      }
+                    } else {
+                      // For datetime-local inputs, parse as local time to avoid timezone issues
+                      const datetimeValue = e.target.value
+                      if (datetimeValue) {
+                        // Parse datetime-local as local time (no timezone conversion)
+                        const [datePart, timePart] = datetimeValue.split('T')
+                        const [year, month, day] = datePart.split('-').map(Number)
+                        const [hour, minute] = timePart.split(':').map(Number)
+                        
+                        const newDate = new Date(year, month - 1, day, hour, minute, 0, 0)
+                        if (!isNaN(newDate.getTime())) {
+                          handleEndTimeChange(newDate)
+                        }
+                      }
                     }
                   }}
                   disabled={isSubmitting}

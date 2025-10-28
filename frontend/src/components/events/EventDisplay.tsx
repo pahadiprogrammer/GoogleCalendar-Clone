@@ -9,7 +9,7 @@ import ConfirmationDialog from '../common/ConfirmationDialog'
 
 interface EventDisplayProps {
   event: CalendarEvent
-  variant?: 'compact' | 'detailed' | 'minimal'
+  variant?: 'compact' | 'detailed' | 'minimal' | 'weekly'
   onClick?: (event: CalendarEvent) => void
   maxWidth?: string | number
   allEvents?: CalendarEvent[]
@@ -215,6 +215,80 @@ const EventDisplay: React.FC<EventDisplayProps> = ({
             }}
           >
             {formatTimeRange()}
+          </Typography>
+        )}
+      </Box>
+    )
+  }
+
+  if (variant === 'weekly') {
+    return (
+      <Box
+        onClick={handleClick}
+        sx={{
+          width: '100%',
+          height: '100%',
+          backgroundColor: getEventColor(event.color),
+          borderRadius: '3px',
+          cursor: onClick ? 'pointer' : 'default',
+          p: 0.5,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          ...getOverlapStyles(),
+          '&:hover': onClick ? {
+            opacity: 0.9,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+          } : {},
+          transition: 'all 0.2s ease-in-out'
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 0.5 }}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'white',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              flex: 1,
+              lineHeight: 1.2
+            }}
+          >
+            {event.title}
+          </Typography>
+          {getOverlapIcon()}
+        </Box>
+        
+        {!event.isAllDay && (
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'rgba(255, 255, 255, 0.95)',
+              fontSize: '0.65rem',
+              display: 'block',
+              lineHeight: 1.1,
+              mt: 'auto'
+            }}
+          >
+            {formatTimeRange()}
+          </Typography>
+        )}
+        
+        {event.isAllDay && (
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'rgba(255, 255, 255, 0.95)',
+              fontSize: '0.65rem',
+              display: 'block',
+              lineHeight: 1.1,
+              mt: 'auto'
+            }}
+          >
+            All day
           </Typography>
         )}
       </Box>

@@ -10,9 +10,10 @@ export const generateEventId = (): string => {
 
 /**
  * Filter events by a specific date
+ * Now properly handles multi-day all-day events that span across the target date
  */
 export const filterEventsByDate = (events: CalendarEvent[], date: Date): CalendarEvent[] => {
-  return events.filter(event => event.startTime && isSameDay(event.startTime, date))
+  return events.filter(event => isEventOnDate(event, date))
 }
 
 /**
@@ -52,6 +53,7 @@ export const isEventOnDate = (event: CalendarEvent, date: Date): boolean => {
 
 /**
  * Get events for a specific hour on a date
+ * Fixed to properly handle multi-hour events that span across time slots
  */
 export const getEventsForHour = (events: CalendarEvent[], date: Date, hour: number): CalendarEvent[] => {
   return events.filter(event => {
@@ -61,9 +63,9 @@ export const getEventsForHour = (events: CalendarEvent[], date: Date, hour: numb
     const eventStartHour = event.startTime.getHours()
     const eventEndHour = event.endTime.getHours()
     
-    // Event starts in this hour or spans across this hour
-    return (eventStartHour <= hour && eventEndHour >= hour) ||
-           (eventStartHour === hour)
+    // Event is active during this hour if: startHour <= hour < endHour
+    // This ensures multi-hour events appear in all their active time slots
+    return eventStartHour <= hour && hour < eventEndHour
   })
 }
 
@@ -132,6 +134,8 @@ export const validateEventFormData = (formData: EventFormData): string[] => {
  * Format event time for display
  */
 export const formatEventTime = (event: CalendarEvent): string => {
+  if (!event.startTime || !event.endTime) return ''
+  
   const startTime = event.startTime.toLocaleTimeString([], { 
     hour: 'numeric', 
     minute: '2-digit',
@@ -151,6 +155,7 @@ export const formatEventTime = (event: CalendarEvent): string => {
  * Get event duration in minutes
  */
 export const getEventDurationMinutes = (event: CalendarEvent): number => {
+  if (!event.startTime || !event.endTime) return 0
   return Math.round((event.endTime.getTime() - event.startTime.getTime()) / (1000 * 60))
 }
 
@@ -158,6 +163,7 @@ export const getEventDurationMinutes = (event: CalendarEvent): number => {
  * Check if two events overlap in time
  */
 export const doEventsOverlap = (event1: CalendarEvent, event2: CalendarEvent): boolean => {
+  if (!event1.startTime || !event1.endTime || !event2.startTime || !event2.endTime) return false
   return event1.startTime < event2.endTime && event2.startTime < event1.endTime
 }
 
@@ -165,6 +171,11 @@ export const doEventsOverlap = (event1: CalendarEvent, event2: CalendarEvent): b
  * Check if two events have a time conflict (more detailed than overlap)
  */
 export const hasTimeConflict = (event1: CalendarEvent, event2: CalendarEvent): boolean => {
+  // Skip if either event has null dates
+  if (!event1.startTime || !event1.endTime || !event2.startTime || !event2.endTime) {
+    return false
+  }
+  
   // Skip if events are on different days
   if (!isSameDay(event1.startTime, event2.startTime)) {
     return false
@@ -236,6 +247,7 @@ export const checkEventConflicts = (
  * Calculate overlap percentage between two events
  */
 export const calculateOverlapPercentage = (event1: CalendarEvent, event2: CalendarEvent): number => {
+  if (!event1.startTime || !event1.endTime || !event2.startTime || !event2.endTime) return 0
   if (!doEventsOverlap(event1, event2)) return 0
   
   const overlapStart = Math.max(event1.startTime.getTime(), event2.startTime.getTime())

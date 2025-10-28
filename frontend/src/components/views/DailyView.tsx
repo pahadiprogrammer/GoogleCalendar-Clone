@@ -133,10 +133,14 @@ const DailyView: React.FC = () => {
                 // Get events for this day and filter by hour
                 const dayEvents = getEventsForDate(currentDate);
                 const hourEvents = dayEvents.filter(event => {
-                  if (event.startTime) {
-                    return event.startTime.getHours() === hour;
-                  }
-                  return false;
+                  if (!event.startTime || !event.endTime) return false;
+                  
+                  const eventStartHour = event.startTime.getHours();
+                  const eventEndHour = event.endTime.getHours();
+                  
+                  // Event is active during this hour if: startHour <= hour < endHour
+                  // This ensures multi-hour events appear in all their active time slots
+                  return eventStartHour <= hour && hour < eventEndHour;
                 });
                 
                 return (

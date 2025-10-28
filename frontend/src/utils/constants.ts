@@ -38,7 +38,7 @@ export const CALENDAR_WEEKS = 6 // Standard calendar grid has 6 weeks
 export const DAYS_IN_WEEK = 7
 
 // Weekly calendar constants
-export const WEEK_START_HOUR = 6 // 6 AM
+export const WEEK_START_HOUR = 0 // 12 AM (midnight)
 export const WEEK_END_HOUR = 23 // 11 PM
 export const HOURS_IN_DAY = WEEK_END_HOUR - WEEK_START_HOUR + 1
 export const TIME_SLOT_HEIGHT = 60 // Height in pixels for each hour slot
