@@ -15,7 +15,8 @@ const WeekHeader: React.FC<WeekHeaderProps> = ({ showFullNames = false }) => {
         mb: 1,
         py: 1,
         borderBottom: 1,
-        borderColor: 'divider'
+        borderColor: 'divider',
+        backgroundColor: '#fafafa'
       }}
     >
       {weekDays.map((day, index) => (

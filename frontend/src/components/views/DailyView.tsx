@@ -52,6 +52,7 @@ const DailyView: React.FC = () => {
                 sx={{ 
                   height: 60, 
                   borderBottom: '2px solid #e0e0e0',
+                  backgroundColor: '#fafafa',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -110,7 +111,7 @@ const DailyView: React.FC = () => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  backgroundColor: isTodayDate ? '#e3f2fd' : 'transparent',
+                  backgroundColor: isTodayDate ? '#e3f2fd' : '#fafafa',
                   px: 2
                 }}
               >
