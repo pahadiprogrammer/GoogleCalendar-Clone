@@ -1,20 +1,20 @@
 import React, { useState } from 'react'
-import { Box, Typography, Chip, Tooltip, IconButton } from '@mui/material'
-import { Warning, ErrorOutline, Delete } from '@mui/icons-material'
+import { Box, Typography, Tooltip, IconButton } from '@mui/material'
+import { Delete } from '@mui/icons-material'
 import { format } from 'date-fns'
 import { CalendarEvent } from '../../types/calendar'
-import { detectEventOverlaps, getOverlapSeverity, formatConflictMessage } from '../../utils/eventUtils'
 import { useEvents } from '../../contexts/EventContext'
 import ConfirmationDialog from '../common/ConfirmationDialog'
 
 interface EventDisplayProps {
   event: CalendarEvent
-  variant?: 'compact' | 'detailed' | 'minimal' | 'weekly'
+  variant?: 'compact' | 'detailed' | 'minimal' | 'weekly' | 'daily'
   onClick?: (event: CalendarEvent) => void
   maxWidth?: string | number
   allEvents?: CalendarEvent[]
   showOverlapIndicator?: boolean
   showDeleteButton?: boolean
+  isOverlapping?: boolean
 }
 
 const EventDisplay: React.FC<EventDisplayProps> = ({
@@ -24,7 +24,8 @@ const EventDisplay: React.FC<EventDisplayProps> = ({
   maxWidth = '100%',
   allEvents = [],
   showOverlapIndicator = true,
-  showDeleteButton = true
+  showDeleteButton = true,
+  isOverlapping = false
 }) => {
   const { deleteEvent } = useEvents()
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
@@ -38,58 +39,30 @@ const EventDisplay: React.FC<EventDisplayProps> = ({
     }
   }
 
-  // Check for overlaps
-  const overlappingEvents = showOverlapIndicator ? detectEventOverlaps(event, allEvents) : []
-  const hasOverlaps = overlappingEvents.length > 0
-  const overlapSeverity = hasOverlaps ? getOverlapSeverity(event, overlappingEvents[0]) : 'none'
+  // Utility function to lighten a color for overlapping events
+  const lightenColor = (color: string, amount: number = 0.3): string => {
+    // Remove # if present
+    const hex = color.replace('#', '')
+    
+    // Parse RGB values
+    const r = parseInt(hex.substr(0, 2), 16)
+    const g = parseInt(hex.substr(2, 2), 16)
+    const b = parseInt(hex.substr(4, 2), 16)
+    
+    // Lighten by mixing with white
+    const newR = Math.round(r + (255 - r) * amount)
+    const newG = Math.round(g + (255 - g) * amount)
+    const newB = Math.round(b + (255 - b) * amount)
+    
+    // Convert back to hex
+    const toHex = (n: number) => n.toString(16).padStart(2, '0')
+    return `#${toHex(newR)}${toHex(newG)}${toHex(newB)}`
+  }
 
   const getEventColor = (color?: string) => {
-    // Use the event's color property, or default to a standard color
-    return color || '#1976d2'
-  }
-
-  const getOverlapStyles = () => {
-    if (!hasOverlaps) return {}
-    
-    switch (overlapSeverity) {
-      case 'minor':
-        return {
-          border: '2px solid #ff9800',
-          boxShadow: '0 0 0 1px rgba(255, 152, 0, 0.3)'
-        }
-      case 'major':
-        return {
-          border: '2px solid #f44336',
-          boxShadow: '0 0 0 2px rgba(244, 67, 54, 0.3)'
-        }
-      case 'complete':
-        return {
-          border: '2px solid #d32f2f',
-          boxShadow: '0 0 0 3px rgba(211, 47, 47, 0.4)',
-          animation: 'pulse 2s infinite'
-        }
-      default:
-        return {}
-    }
-  }
-
-  const getOverlapIcon = () => {
-    if (!hasOverlaps) return null
-    
-    const iconColor = overlapSeverity === 'minor' ? '#ff9800' : '#f44336'
-    const IconComponent = overlapSeverity === 'complete' ? ErrorOutline : Warning
-    
-    return (
-      <Tooltip title={formatConflictMessage(overlappingEvents)} arrow>
-        <IconComponent 
-          sx={{ 
-            fontSize: '14px', 
-            color: iconColor,
-            ml: 0.5
-          }} 
-        />
-      </Tooltip>
-    )
+    const baseColor = color || '#1976d2'
+    // Return lighter shade if this event is overlapping with others
+    return isOverlapping ? lightenColor(baseColor, 0.4) : baseColor
   }
 
   const formatTime = (date: Date) => {
@@ -142,7 +115,6 @@ const EventDisplay: React.FC<EventDisplayProps> = ({
           alignItems: 'center',
           px: 0.5,
           mb: 0.25,
-          ...getOverlapStyles(),
           '&:hover': onClick ? {
             opacity: 0.8,
             transform: 'scale(1.02)'
@@ -163,7 +135,6 @@ const EventDisplay: React.FC<EventDisplayProps> = ({
         >
           {event.title}
         </Typography>
-        {getOverlapIcon()}
       </Box>
     )
   }
@@ -180,7 +151,6 @@ const EventDisplay: React.FC<EventDisplayProps> = ({
           cursor: onClick ? 'pointer' : 'default',
           p: 0.5,
           mb: 0.5,
-          ...getOverlapStyles(),
           '&:hover': onClick ? {
             opacity: 0.9,
             transform: 'scale(1.02)'
@@ -188,23 +158,20 @@ const EventDisplay: React.FC<EventDisplayProps> = ({
           transition: 'all 0.2s ease-in-out'
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography
-            variant="caption"
-            sx={{
-              color: 'white',
-              fontSize: '0.7rem',
-              fontWeight: 600,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              flex: 1
-            }}
-          >
-            {event.title}
-          </Typography>
-          {getOverlapIcon()}
-        </Box>
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'white',
+            fontSize: '0.7rem',
+            fontWeight: 600,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            display: 'block'
+          }}
+        >
+          {event.title}
+        </Typography>
         {!event.isAllDay && (
           <Typography
             variant="caption"
@@ -235,7 +202,6 @@ const EventDisplay: React.FC<EventDisplayProps> = ({
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
-          ...getOverlapStyles(),
           '&:hover': onClick ? {
             opacity: 0.9,
             boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
@@ -243,24 +209,21 @@ const EventDisplay: React.FC<EventDisplayProps> = ({
           transition: 'all 0.2s ease-in-out'
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 0.5 }}>
-          <Typography
-            variant="caption"
-            sx={{
-              color: 'white',
-              fontSize: '0.75rem',
-              fontWeight: 600,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              flex: 1,
-              lineHeight: 1.2
-            }}
-          >
-            {event.title}
-          </Typography>
-          {getOverlapIcon()}
-        </Box>
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'white',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            lineHeight: 1.2,
+            mb: 0.5
+          }}
+        >
+          {event.title}
+        </Typography>
         
         {!event.isAllDay && (
           <Typography
@@ -295,6 +258,94 @@ const EventDisplay: React.FC<EventDisplayProps> = ({
     )
   }
 
+  if (variant === 'daily') {
+    return (
+      <>
+        <Box
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          onClick={handleClick}
+          sx={{
+            width: '100%',
+            maxWidth,
+            backgroundColor: getEventColor(event.color),
+            borderRadius: '6px',
+            cursor: onClick ? 'pointer' : 'default',
+            p: 1,
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+            position: 'relative',
+            '&:hover': onClick ? {
+              boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+              transform: 'translateY(-1px)',
+              opacity: 0.9
+            } : {},
+            transition: 'all 0.2s ease-in-out'
+          }}
+        >
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                fontWeight: 600,
+                color: 'white',
+                fontSize: '0.85rem',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                flex: 1
+              }}
+            >
+              {event.title}
+            </Typography>
+            {showDeleteButton && isHovered && (
+              <Tooltip title="Delete Event" arrow>
+                <IconButton
+                  onClick={handleDeleteClick}
+                  size="small"
+                  sx={{
+                    color: 'rgba(255, 255, 255, 0.9)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    },
+                    width: 20,
+                    height: 20,
+                    ml: 1
+                  }}
+                >
+                  <Delete sx={{ fontSize: '12px' }} />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
+
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'rgba(255, 255, 255, 0.9)',
+              display: 'block',
+              fontSize: '0.7rem'
+            }}
+          >
+            {formatTimeRange()}
+          </Typography>
+        </Box>
+
+        <ConfirmationDialog
+          open={showDeleteDialog}
+          title="Delete Event"
+          message={`Are you sure you want to delete "${event.title}"? This action cannot be undone.`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          onConfirm={handleDeleteConfirm}
+          onCancel={handleDeleteCancel}
+          loading={isDeleting}
+          confirmColor="error"
+        />
+      </>
+    )
+  }
+
   // Detailed variant
   return (
     <>
@@ -313,7 +364,6 @@ const EventDisplay: React.FC<EventDisplayProps> = ({
           backgroundColor: 'white',
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
           position: 'relative',
-          ...getOverlapStyles(),
           '&:hover': onClick ? {
             boxShadow: '0 4px 8px rgba(0,0,0,0.15)',
             transform: 'translateY(-1px)'
@@ -322,94 +372,61 @@ const EventDisplay: React.FC<EventDisplayProps> = ({
         }}
       >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-            <Typography
-              variant="subtitle2"
-              sx={{
-                fontWeight: 600,
-                color: getEventColor(event.color),
-                mr: 1
-              }}
-            >
-              {event.title}
-            </Typography>
-            {getOverlapIcon()}
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            {showDeleteButton && isHovered && (
-              <Tooltip title="Delete Event" arrow>
-                <IconButton
-                  onClick={handleDeleteClick}
-                  size="small"
-                  sx={{
-                    color: '#f44336',
-                    backgroundColor: 'rgba(244, 67, 54, 0.1)',
-                    '&:hover': {
-                      backgroundColor: 'rgba(244, 67, 54, 0.2)',
-                    },
-                    width: 24,
-                    height: 24
-                  }}
-                >
-                  <Delete sx={{ fontSize: '14px' }} />
-                </IconButton>
-              </Tooltip>
-            )}
-            <Chip
-              label={hasOverlaps ? 'Conflict' : 'Event'}
-              size="small"
-              sx={{
-                backgroundColor: hasOverlaps ? '#f44336' : getEventColor(event.color),
-                color: 'white',
-                fontSize: '0.6rem',
-                height: '20px'
-              }}
-            />
-          </Box>
+          <Typography
+            variant="subtitle2"
+            sx={{
+              fontWeight: 600,
+              color: getEventColor(event.color),
+              flex: 1
+            }}
+          >
+            {event.title}
+          </Typography>
+          {showDeleteButton && isHovered && (
+            <Tooltip title="Delete Event" arrow>
+              <IconButton
+                onClick={handleDeleteClick}
+                size="small"
+                sx={{
+                  color: '#f44336',
+                  backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(244, 67, 54, 0.2)',
+                  },
+                  width: 24,
+                  height: 24,
+                  ml: 1
+                }}
+              >
+                <Delete sx={{ fontSize: '14px' }} />
+              </IconButton>
+            </Tooltip>
+          )}
         </Box>
 
-      <Typography
-        variant="caption"
-        sx={{
-          color: 'text.secondary',
-          display: 'block',
-          mb: event.description ? 1 : 0
-        }}
-      >
-        {formatTimeRange()}
-      </Typography>
-
-      {hasOverlaps && (
         <Typography
           variant="caption"
           sx={{
-            color: '#f44336',
-            display: 'block',
-            mb: event.description ? 1 : 0,
-            fontWeight: 500
+            color: 'text.secondary',
+            display: 'block'
           }}
         >
-          {formatConflictMessage(overlappingEvents)}
+          {formatTimeRange()}
         </Typography>
-      )}
 
-      {event.description && (
-        <Typography
-          variant="body2"
-          sx={{
-            color: 'text.primary',
-            fontSize: '0.8rem',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical'
-          }}
-        >
-          {event.description}
-        </Typography>
-      )}
-
+        {event.description && (
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+              display: 'block',
+              mt: 1,
+              fontSize: '0.8rem'
+            }}
+          >
+            {event.description}
+          </Typography>
+        )}
       </Box>
 
       <ConfirmationDialog

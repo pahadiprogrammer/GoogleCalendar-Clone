@@ -4,9 +4,9 @@ import { useCalendar } from '../../contexts/CalendarContext';
 import { useEvents } from '../../contexts/EventContext';
 import { CalendarEvent } from '../../types/calendar';
 import { formatTimeSlot } from '../../utils/dateUtils';
-import { WEEK_START_HOUR, WEEK_END_HOUR } from '../../utils/constants';
+import { WEEK_START_HOUR, WEEK_END_HOUR, TIME_SLOT_HEIGHT } from '../../utils/constants';
 import { format, isToday } from 'date-fns';
-import TimeSlot from '../calendar/TimeSlot';
+import DailyEventLayout from '../calendar/DailyEventLayout';
 import EventDetailsDialog from '../events/EventDetailsDialog';
 
 const DailyView: React.FC = () => {
@@ -127,35 +127,49 @@ const DailyView: React.FC = () => {
                 </Typography>
               </Box>
 
-              {/* Time slots */}
-              {Array.from({ length: WEEK_END_HOUR - WEEK_START_HOUR + 1 }, (_, index) => {
-                const hour = WEEK_START_HOUR + index;
-                // Get events for this day and filter by hour
-                const dayEvents = getEventsForDate(currentDate);
-                const hourEvents = dayEvents.filter(event => {
-                  if (!event.startTime || !event.endTime) return false;
+              {/* Time grid background with precise event positioning */}
+              <Box sx={{ position: 'relative' }}>
+                {/* Hour grid lines */}
+                {Array.from({ length: WEEK_END_HOUR - WEEK_START_HOUR + 1 }, (_, index) => {
+                  const hour = WEEK_START_HOUR + index;
+                  const isCurrentHour = isTodayDate && new Date().getHours() === hour;
                   
-                  const eventStartHour = event.startTime.getHours();
-                  const eventEndHour = event.endTime.getHours();
-                  
-                  // Event is active during this hour if: startHour <= hour < endHour
-                  // This ensures multi-hour events appear in all their active time slots
-                  return eventStartHour <= hour && hour < eventEndHour;
-                });
-                
-                return (
-                  <TimeSlot
-                    key={hour}
-                    hour={hour}
+                  return (
+                    <Box
+                      key={hour}
+                      sx={{
+                        height: TIME_SLOT_HEIGHT,
+                        borderBottom: '1px solid #e0e0e0',
+                        backgroundColor: isCurrentHour ? '#fff3e0' : 'transparent',
+                        cursor: 'pointer',
+                        '&:hover': {
+                          backgroundColor: isCurrentHour ? '#ffe0b2' : '#f5f5f5'
+                        }
+                      }}
+                      onClick={() => handleTimeSlotClick(currentDate, hour)}
+                    />
+                  );
+                })}
+
+                {/* Precise event positioning overlay - positioned absolutely to align with time grid */}
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '100%',
+                    pointerEvents: 'none' // Allow clicks to pass through to time slots
+                  }}
+                >
+                  <DailyEventLayout
                     date={currentDate}
-                    events={hourEvents}
-                    isCurrentHour={isTodayDate && new Date().getHours() === hour}
-                    onClick={handleTimeSlotClick}
-                    onEventClick={handleEventClick}
+                    events={getEventsForDate(currentDate)}
                     allEvents={allEvents}
+                    onEventClick={handleEventClick}
                   />
-                );
-              })}
+                </Box>
+              </Box>
             </Box>
           </Grid>
         </Grid>

@@ -4,7 +4,7 @@ import { CalendarEvent } from '../../types/calendar';
 import { WEEK_START_HOUR, WEEK_END_HOUR, TIME_SLOT_HEIGHT } from '../../utils/constants';
 import EventDisplay from '../events/EventDisplay';
 
-interface WeekEventLayoutProps {
+interface DailyEventLayoutProps {
   date: Date;
   events: CalendarEvent[];
   allEvents: CalendarEvent[];
@@ -24,13 +24,13 @@ const PIXELS_PER_MINUTE = TIME_SLOT_HEIGHT / 60; // 60px per hour = 1px per minu
 const TOTAL_HOURS = WEEK_END_HOUR - WEEK_START_HOUR + 1;
 const TOTAL_HEIGHT = TOTAL_HOURS * TIME_SLOT_HEIGHT;
 
-const WeekEventLayout: React.FC<WeekEventLayoutProps> = ({
+const DailyEventLayout: React.FC<DailyEventLayoutProps> = ({
   date,
   events,
   allEvents,
   onEventClick
 }) => {
-  // Calculate event positions with overlap handling
+  // Calculate event positions with overlap handling for daily view
   const calculateEventPositions = (): Map<string, EventPosition> => {
     const positions = new Map<string, EventPosition>();
     
@@ -145,13 +145,13 @@ const WeekEventLayout: React.FC<WeekEventLayoutProps> = ({
                 height: '100%', // Ensure child respects parent height
                 overflow: 'hidden', // Prevent content from expanding beyond calculated height
                 border: '1px solid rgba(255, 255, 255, 0.2)', // Subtle border for better separation
-                borderRadius: '3px',
+                borderRadius: '6px',
                 backgroundColor: 'transparent'
               }}
             >
               <EventDisplay
                 event={event}
-                variant="weekly"
+                variant="daily"
                 allEvents={allEvents}
                 showOverlapIndicator={true}
                 onClick={handleEventClick}
@@ -166,4 +166,4 @@ const WeekEventLayout: React.FC<WeekEventLayoutProps> = ({
   );
 };
 
-export default WeekEventLayout;
+export default DailyEventLayout;
