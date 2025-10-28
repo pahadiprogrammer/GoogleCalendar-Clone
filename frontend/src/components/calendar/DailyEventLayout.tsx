@@ -62,18 +62,16 @@ const DailyEventLayout: React.FC<DailyEventLayoutProps> = ({
       const top = (clampedStartMinutes - dayStartMinutes) * PIXELS_PER_MINUTE;
       const height = (clampedEndMinutes - clampedStartMinutes) * PIXELS_PER_MINUTE;
 
-      // Find available column (handle overlaps)
-      let columnIndex = 0;
+      // Find available column (handle overlaps) - FIXED: Safe column cleanup
       const eventStartTime = event.startTime.getTime();
       
-      // Remove expired columns
-      columns.forEach((col, index) => {
-        if (col.endTime <= eventStartTime) {
-          columns.splice(index, 1);
-        }
-      });
+      // Remove expired columns safely - filter instead of splice during iteration
+      const activeColumns = columns.filter(col => col.endTime > eventStartTime);
+      columns.length = 0; // Clear array
+      columns.push(...activeColumns); // Repopulate with active columns
 
       // Find first available column
+      let columnIndex = 0;
       while (columnIndex < columns.length) {
         if (columns[columnIndex].endTime <= eventStartTime) {
           break;

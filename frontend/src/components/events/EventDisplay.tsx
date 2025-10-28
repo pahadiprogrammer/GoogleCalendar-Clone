@@ -267,6 +267,7 @@ const EventDisplay: React.FC<EventDisplayProps> = ({
           onClick={handleClick}
           sx={{
             width: '100%',
+            height: '100%', // CRITICAL FIX: Respect parent container height for boundary crossing
             maxWidth,
             backgroundColor: getEventColor(event.color),
             borderRadius: '6px',
@@ -274,6 +275,9 @@ const EventDisplay: React.FC<EventDisplayProps> = ({
             p: 1,
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
             position: 'relative',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden', // Prevent content overflow
             '&:hover': onClick ? {
               boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
               transform: 'translateY(-1px)',
@@ -297,26 +301,6 @@ const EventDisplay: React.FC<EventDisplayProps> = ({
             >
               {event.title}
             </Typography>
-            {showDeleteButton && isHovered && (
-              <Tooltip title="Delete Event" arrow>
-                <IconButton
-                  onClick={handleDeleteClick}
-                  size="small"
-                  sx={{
-                    color: 'rgba(255, 255, 255, 0.9)',
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    '&:hover': {
-                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                    },
-                    width: 20,
-                    height: 20,
-                    ml: 1
-                  }}
-                >
-                  <Delete sx={{ fontSize: '12px' }} />
-                </IconButton>
-              </Tooltip>
-            )}
           </Box>
 
           <Typography
